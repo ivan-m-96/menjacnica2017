@@ -199,7 +199,7 @@ public class DodajKursGUI extends JFrame {
 			glavniProzor.sistem.dodajValutu(valuta);
 
 			// Osvezavanje glavnog prozora
-			glavniProzor.prikaziSveValute();
+			GUIKontroler.prikaziSveValute();
 			
 			//Zatvaranje DodajValutuGUI prozora
 			dispose();

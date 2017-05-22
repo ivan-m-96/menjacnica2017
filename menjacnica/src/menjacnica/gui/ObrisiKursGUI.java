@@ -230,7 +230,7 @@ public class ObrisiKursGUI extends JFrame {
 		try{
 			glavniProzor.sistem.obrisiValutu(valuta);
 			
-			glavniProzor.prikaziSveValute();
+			GUIKontroler.prikaziSveValute();
 			dispose();
 		} catch (Exception e1) {
 			JOptionPane.showMessageDialog(contentPane, e1.getMessage(),
