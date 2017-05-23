@@ -4,28 +4,32 @@ import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.LinkedList;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 
 import menjacnica.Menjacnica;
 import menjacnica.MenjacnicaInterface;
+import menjacnica.Valuta;
 import menjacnica.gui.models.MenjacnicaTableModel;
 
 public class GUIKontroler {
 	
 	private static MenjacnicaGUI menjacnicaGui;
-	private static MenjacnicaInterface menjacnica;
+	private static MenjacnicaInterface sistem;
 	private static ObrisiKursGUI obrisiKursGui;
 	private static DodajKursGUI dodajKursGui;
-	
+	private static IzvrsiZamenuGUI izvrsiZamenuGui;
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			
 			@Override
 			public void run() {
-				menjacnica = new Menjacnica();
+				sistem = new Menjacnica();
 				menjacnicaGui = new MenjacnicaGUI();
 				menjacnicaGui.setVisible(true);
 				menjacnicaGui.setLocationRelativeTo(null);
@@ -50,10 +54,10 @@ public class GUIKontroler {
 		
 		if (menjacnicaGui.getTable().getSelectedRow() != -1) {
 			MenjacnicaTableModel model = (MenjacnicaTableModel)(menjacnicaGui.getTable().getModel());
-			IzvrsiZamenuGUI prozor = new IzvrsiZamenuGUI(menjacnicaGui,
+			izvrsiZamenuGui = new IzvrsiZamenuGUI(
 					model.vratiValutu(menjacnicaGui.getTable().getSelectedRow()));
-			prozor.setLocationRelativeTo(menjacnicaGui);
-			prozor.setVisible(true);
+			izvrsiZamenuGui.setLocationRelativeTo(menjacnicaGui);
+			izvrsiZamenuGui.setVisible(true);
 		}
 	}
 	public static void prikaziAboutProzor(){
@@ -62,9 +66,9 @@ public class GUIKontroler {
 				JOptionPane.INFORMATION_MESSAGE);
 	}
 	public static void prikaziDodajKursGUI() {
-		DodajKursGUI prozor = new DodajKursGUI(menjacnicaGui);
-		prozor.setLocationRelativeTo(menjacnicaGui.getContentPane());
-		prozor.setVisible(true);
+		dodajKursGui = new DodajKursGUI();
+		dodajKursGui.setLocationRelativeTo(menjacnicaGui.getContentPane());
+		dodajKursGui.setVisible(true);
 	}
 	public static void sacuvajUFajl() {
 		try {
@@ -74,7 +78,7 @@ public class GUIKontroler {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
 
-				menjacnicaGui.sistem.sacuvajUFajl(file.getAbsolutePath());
+				sistem.sacuvajUFajl(file.getAbsolutePath());
 			}
 		} catch (Exception e1) {
 			JOptionPane.showMessageDialog(menjacnicaGui.getContentPane(), e1.getMessage(),
@@ -90,8 +94,8 @@ public class GUIKontroler {
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				menjacnicaGui.sistem.ucitajIzFajla(file.getAbsolutePath());
-				prikaziSveValute();
+				sistem.ucitajIzFajla(file.getAbsolutePath());
+				menjacnicaGui.prikaziSveValute();
 			}	
 		} catch (Exception e1) {
 			JOptionPane.showMessageDialog(menjacnicaGui.getContentPane(), e1.getMessage(),
@@ -99,24 +103,54 @@ public class GUIKontroler {
 		}
 	}
 	
-	protected static void prikaziSveValute() {
-
-		MenjacnicaTableModel model = (MenjacnicaTableModel)(menjacnicaGui.getTable().getModel());
-		model.staviSveValuteUModel(menjacnicaGui.sistem.vratiKursnuListu());
-
-	}
+	
 
 	public static void prikaziObrisiKursGUI() {
 		
 		if (menjacnicaGui.getTable().getSelectedRow() != -1) {
 			MenjacnicaTableModel model = (MenjacnicaTableModel)(menjacnicaGui.getTable().getModel());
-			ObrisiKursGUI prozor = new ObrisiKursGUI(menjacnicaGui,
+			obrisiKursGui = new ObrisiKursGUI(
 					model.vratiValutu(menjacnicaGui.getTable().getSelectedRow()));
-			prozor.setLocationRelativeTo(menjacnicaGui.getContentPane());
-			prozor.setVisible(true);
+			obrisiKursGui.setLocationRelativeTo(menjacnicaGui.getContentPane());
+			obrisiKursGui.setVisible(true);
 		}
 	}
-	
+	public static void dodajValutu(int sifra, String naziv, String skraceniNaziv, double prodajni, double kupovni, double srednji) {
+		try{
+		Valuta valuta = new Valuta();
+		valuta.setNaziv(naziv);
+		valuta.setSkraceniNaziv(skraceniNaziv);
+		valuta.setSifra(sifra);
+		valuta.setProdajni(prodajni);
+		valuta.setKupovni(kupovni);
+		valuta.setSrednji(srednji);
+		sistem.dodajValutu(valuta);
+		menjacnicaGui.prikaziSveValute();
+		dodajKursGui.dispose();
+		} catch (Exception e1) {
+		JOptionPane.showMessageDialog(menjacnicaGui.getContentPane(), e1.getMessage(),
+				"Greska", JOptionPane.ERROR_MESSAGE);
+	}
+	}
+	public static LinkedList<Valuta> vratiKursnuListu() {
+		return sistem.vratiKursnuListu();
+	}
+	public static void obrisiValutu(Valuta valuta) {
+		try{
+			sistem.obrisiValutu(valuta);
+			menjacnicaGui.prikaziSveValute();
+			
+		} catch (Exception e1) {
+			JOptionPane.showMessageDialog(menjacnicaGui.getContentPane(), e1.getMessage(),
+					"Greska", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	public static double izvrsiZamenu(Valuta valuta, boolean selected, String textFieldIznos) {
+		return sistem.izvrsiTransakciju(valuta,
+				selected, 
+				Double.parseDouble(textFieldIznos));
+
+	}
 	public static void ugasiAplikaciju() {
 		int opcija = JOptionPane.showConfirmDialog(menjacnicaGui,
 				"Da li ZAISTA zelite da izadjete iz aplikacije", "Izlazak",

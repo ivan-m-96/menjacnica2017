@@ -7,7 +7,6 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
 import java.awt.Toolkit;
 
@@ -16,12 +15,8 @@ import javax.swing.JButton;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
-import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
-import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
-import javax.swing.border.TitledBorder;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
@@ -32,25 +27,21 @@ import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
 import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
-import javax.swing.JList;
 
-import menjacnica.Menjacnica;
-import menjacnica.Valuta;
 import menjacnica.gui.models.MenjacnicaTableModel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
 
 
 public class MenjacnicaGUI extends JFrame {
 
 	private JPanel contentPane;
+	
+
 	private JScrollPane scrollPane;
 	private JPanel panel;
 	private JButton btnNewButton;
@@ -65,8 +56,8 @@ public class MenjacnicaGUI extends JFrame {
 	private JMenuItem mntmAbout;
 	
 	//klasa na logickom nivou
-	protected Menjacnica sistem;
-	JTable table;
+	
+	private JTable table;
 
 	/**
 	 * Launch the application.
@@ -106,7 +97,7 @@ public class MenjacnicaGUI extends JFrame {
 		contentPane.add(getScrollPane(), BorderLayout.CENTER);
 		contentPane.add(getPanel(), BorderLayout.EAST);
 		
-		sistem = new Menjacnica();
+		
 	}
 
 	private JScrollPane getScrollPane() {
@@ -237,20 +228,17 @@ public class MenjacnicaGUI extends JFrame {
 		}
 		return mntmAbout;
 	}
+	public void prikaziSveValute(){
+		MenjacnicaTableModel model = (MenjacnicaTableModel)table.getModel();
+		model.staviSveValuteUModel(GUIKontroler.vratiKursnuListu());
+		
+	}
+
+	
 	private static void addPopup(Component component, final JPopupMenu popup) {
 	}
 	
-
-	
-	
-	
-
-
-	
-	
-
-
-	JTable getTable() {
+	protected JTable getTable() {
 		if (table == null) {
 			table = new JTable();
 			table.setModel(new MenjacnicaTableModel());
